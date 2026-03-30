@@ -81,4 +81,15 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
+    public void ShowIndicator(float duration)
+    {
+        StartCoroutine(IndicatorRoutine(duration));
+    }
+
+    IEnumerator IndicatorRoutine(float duration)
+    {
+        powerUpIndicator.SetActive(true);
+        yield return new WaitForSeconds(duration);
+        powerUpIndicator.SetActive(false);
+    }
 }

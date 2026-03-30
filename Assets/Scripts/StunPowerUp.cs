@@ -14,6 +14,12 @@ public class StunPowerUp : MonoBehaviour
             {
                 enemy.Stun(stunDuration);
             }
+            
+            PlayerController playerScript = other.GetComponent<PlayerController>();
+            if (playerScript != null)
+            {
+                playerScript.ShowIndicator(stunDuration);
+            }
 
             Destroy(gameObject);
         }
