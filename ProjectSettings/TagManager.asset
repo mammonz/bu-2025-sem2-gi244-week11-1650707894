@@ -6,6 +6,7 @@ TagManager:
   tags:
   - PowerUp
   - Enemy
+  - Stun
   layers:
   - Default
   - TransparentFX
