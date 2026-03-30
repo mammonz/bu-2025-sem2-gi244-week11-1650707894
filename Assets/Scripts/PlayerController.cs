@@ -2,15 +2,23 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+
 public class PlayerController : MonoBehaviour
 {
     public float speed = 5f;
+    public Transform focalPoint;
+
+    public bool hasPowerUp;
+
+    public GameObject powerUpIndicator;
 
     private Rigidbody rb;
 
     private InputAction moveAction;
     private InputAction smashAction;
     private InputAction breakAction;
+
+    private Coroutine powerUpRoutine;
 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -25,6 +33,52 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        var move = moveAction.ReadValue<Vector2>();
+        rb.AddForce(move.y * speed * focalPoint.forward);
+        if(breakAction.IsPressed())
+        {
+            rb.linearVelocity = new Vector3(0, 0, 0);
+        }
+    }
 
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("PowerUp"))
+        {
+            hasPowerUp = true;
+            Destroy(other.gameObject);
+
+            powerUpIndicator.SetActive(true);
+
+            if (powerUpRoutine != null)
+            {
+                StopCoroutine(powerUpRoutine);
+            }
+            StartCoroutine(PowerUpCooldown());
+            
+        }
+    }
+
+    IEnumerator PowerUpCooldown()
+    {
+        yield return new WaitForSeconds(10f);
+        hasPowerUp = false;
+
+        powerUpIndicator.SetActive(false);
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Enemy") && hasPowerUp)
+        {
+            if (hasPowerUp)
+            {
+                var enemyRb = collision.gameObject.GetComponent<Rigidbody>();
+                var dir = transform.position - enemyRb.transform.position;
+                dir.Normalize();
+                enemyRb.AddForce(dir * 10 , ForceMode.Impulse);
+                Destroy(collision.gameObject);
+            }
+        }
     }
 }
